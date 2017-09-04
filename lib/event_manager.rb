@@ -38,6 +38,18 @@ def clean_phone(phone)
   phone
 end
 
+$hour = Hash.new(0)
+
+def time_analyzer(time)
+  time = DateTime.strptime(time, '%m/%d/%y %H:%M')
+  $hour[time.hour] += 1
+end
+
+def hour_target
+  hour = $hour.sort_by{ |k,v|; v }.reverse.map{ |hours|; hours.first}
+  puts hour[0..2].join(', ')
+end
+
 puts "EventManager Initialized!\n\n"
 
 contents = CSV.open 'event_attendees.csv', headers: true, header_converters: :symbol
@@ -53,10 +65,13 @@ contents.each do |row|
 
   phone = clean_phone(row[:homephone])
 
-  legislators = legislators_by_zipcode(zipcode)
+  # legislators = legislators_by_zipcode(zipcode)
 
-  form_letter = erb_template.result binding
+  # form_letter = erb_template.result binding
 
-  save_thank_you_letters(id, form_letter)
+  # save_thank_you_letters(id, form_letter)
+  time_analyzer(row[:regdate])
+
 end
 
+hour_target
