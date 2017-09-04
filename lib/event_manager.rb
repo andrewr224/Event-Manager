@@ -38,16 +38,17 @@ def clean_phone(phone)
   phone
 end
 
-$hour = Hash.new(0)
+$hours = Hash.new(0)
+$wdays = Hash.new(0)
 
 def time_analyzer(time)
   time = DateTime.strptime(time, '%m/%d/%y %H:%M')
-  $hour[time.hour] += 1
+  $hours[time.hour] += 1
+  $wdays[time.wday] += 1
 end
 
-def hour_target
-  hour = $hour.sort_by{ |k,v|; v }.reverse.map{ |hours|; hours.first}
-  puts hour[0..2].join(', ')
+def time_target(time)
+  time.sort_by{ |k,v|; v }.reverse.map{ |t|; t.first}[0..2].join(', ')
 end
 
 puts "EventManager Initialized!\n\n"
@@ -65,13 +66,14 @@ contents.each do |row|
 
   phone = clean_phone(row[:homephone])
 
-  # legislators = legislators_by_zipcode(zipcode)
-
-  # form_letter = erb_template.result binding
-
-  # save_thank_you_letters(id, form_letter)
   time_analyzer(row[:regdate])
 
+  legislators = legislators_by_zipcode(zipcode)
+
+  form_letter = erb_template.result binding
+
+  save_thank_you_letters(id, form_letter)
 end
 
-hour_target
+puts "Most popular hours are: #{time_target($hours)}"
+puts "Most popular days are: #{time_target($wdays)}"
