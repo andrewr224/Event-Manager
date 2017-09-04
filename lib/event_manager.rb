@@ -22,6 +22,22 @@ def save_thank_you_letters(id, form_letter)
   end
 end
 
+def clean_phone(phone)
+  phone = phone.scan(/\d+/).join('')
+
+  if (phone.length < 10) || (phone.length > 11)
+    phone = nil
+  elsif phone.length == 11
+    if phone[0] == "1"
+      phone = phone[1..10]
+    else
+      phone = nil
+    end
+  end
+
+  phone
+end
+
 puts "EventManager Initialized!\n\n"
 
 contents = CSV.open 'event_attendees.csv', headers: true, header_converters: :symbol
@@ -34,6 +50,8 @@ contents.each do |row|
   name = row[:first_name]
 
   zipcode = clean_zipcode(row[:zipcode])
+
+  phone = clean_phone(row[:homephone])
 
   legislators = legislators_by_zipcode(zipcode)
 
